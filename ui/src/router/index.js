@@ -63,7 +63,7 @@ const router = createRouter({
     routes: [
         {
             path: "/",
-            redirect: "/signin",
+            redirect: "/index/dashboard",
         },
         {
             path: "/signin",
