@@ -8,7 +8,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 
 const app = createApp(App);
 app.config.globalProperties = {
-  API_URL: `http://${window.location.hostname}:8082/api/`,
+  API_URL: `http://${window.location.hostname}:8083/api/`,
 };
 
 app.use(router);
