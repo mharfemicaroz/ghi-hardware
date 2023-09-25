@@ -1,7 +1,7 @@
 <template>
     <GlobalLoader />
     <div class="main-wrappers">
-        <HeaderComponent2 />
+        <HeaderComponent />
         <div class="page-wrapper ms-0">
             <div class="content">
                 <div class="row">
@@ -1553,12 +1553,12 @@
 <script>
 
 import GlobalLoader from '../../common/GlobalLoader.vue';
-import HeaderComponent2 from '../../common/HeaderComponent2.vue';
+import HeaderComponent from '../../common/HeaderComponent.vue';
 
 export default {
     components: {
         GlobalLoader,
-        HeaderComponent2,
+        HeaderComponent,
     },
 }
 

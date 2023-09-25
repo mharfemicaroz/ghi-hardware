@@ -1,24 +1,15 @@
 <template>
     <div class="header">
 
-        <div class="header-left active">
+        <div class="header-left border-0 ">
             <a href="index.html" class="logo">
                 <img src="/img/logo.png" alt="">
             </a>
             <a href="index.html" class="logo-small">
                 <img src="/img/logo-small.png" alt="">
             </a>
-            <a id="toggle_btn" href="javascript:void(0);">
-            </a>
         </div>
 
-        <a id="mobile_btn" class="mobile_btn" href="#sidebar">
-            <span class="bar-icon">
-                <span></span>
-                <span></span>
-                <span></span>
-            </span>
-        </a>
 
         <ul class="nav user-menu">
 
@@ -79,9 +70,11 @@
                                             <img alt="" src="/img/profiles/avatar-02.jpg">
                                         </span>
                                         <div class="media-body flex-grow-1">
-                                            <p class="noti-details"><span class="noti-title">John Doe</span> added new
-                                                task <span class="noti-title">Patient appointment booking</span></p>
-                                            <p class="noti-time"><span class="notification-time">4 mins ago</span></p>
+                                            <p class="noti-details"><span class="noti-title">John Doe</span> added
+                                                new task <span class="noti-title">Patient appointment booking</span>
+                                            </p>
+                                            <p class="noti-time"><span class="notification-time">4 mins ago</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </a>
@@ -94,9 +87,10 @@
                                         </span>
                                         <div class="media-body flex-grow-1">
                                             <p class="noti-details"><span class="noti-title">Tarah Shropshire</span>
-                                                changed the task name <span class="noti-title">Appointment booking with
-                                                    payment gateway</span></p>
-                                            <p class="noti-time"><span class="notification-time">6 mins ago</span></p>
+                                                changed the task name <span class="noti-title">Appointment booking
+                                                    with payment gateway</span></p>
+                                            <p class="noti-time"><span class="notification-time">6 mins ago</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </a>
@@ -108,12 +102,12 @@
                                             <img alt="" src="/img/profiles/avatar-06.jpg">
                                         </span>
                                         <div class="media-body flex-grow-1">
-                                            <p class="noti-details"><span class="noti-title">Misty Tison</span> added
-                                                <span class="noti-title">Domenic Houston</span> and <span
+                                            <p class="noti-details"><span class="noti-title">Misty Tison</span>
+                                                added <span class="noti-title">Domenic Houston</span> and <span
                                                     class="noti-title">Claire Mapes</span> to project <span
-                                                    class="noti-title">Doctor available module</span>
+                                                    class="noti-title">Doctor available module</span></p>
+                                            <p class="noti-time"><span class="notification-time">8 mins ago</span>
                                             </p>
-                                            <p class="noti-time"><span class="notification-time">8 mins ago</span></p>
                                         </div>
                                     </div>
                                 </a>
@@ -128,7 +122,8 @@
                                             <p class="noti-details"><span class="noti-title">Rolland Webber</span>
                                                 completed task <span class="noti-title">Patient and Doctor video
                                                     conferencing</span></p>
-                                            <p class="noti-time"><span class="notification-time">12 mins ago</span></p>
+                                            <p class="noti-time"><span class="notification-time">12 mins ago</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </a>
@@ -141,8 +136,10 @@
                                         </span>
                                         <div class="media-body flex-grow-1">
                                             <p class="noti-details"><span class="noti-title">Bernardo Galaviz</span>
-                                                added new task <span class="noti-title">Private chat module</span></p>
-                                            <p class="noti-time"><span class="notification-time">2 days ago</span></p>
+                                                added new task <span class="noti-title">Private chat module</span>
+                                            </p>
+                                            <p class="noti-time"><span class="notification-time">2 days ago</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </a>
@@ -171,12 +168,23 @@
                             </div>
                         </div>
                         <hr class="m-0">
-                        <a class="dropdown-item" href="profile.html"> <i class="me-2" data-feather="user"></i> My
-                            Profile</a>
-                        <a class="dropdown-item" href="generalsettings.html"><i class="me-2"
-                                data-feather="settings"></i>Settings</a>
+                        <a class="dropdown-item" href="profile.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" class="feather feather-user me-2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg> My Profile</a>
+                        <a class="dropdown-item" href="generalsettings.html"><svg xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-settings me-2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path
+                                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                                </path>
+                            </svg>Settings</a>
                         <hr class="m-0">
-                        <a class="dropdown-item logout pb-0" href="signin.html"><img src="/img/icons/log-out.svg"
+                        <a class="dropdown-item logout pb-0" href="#" @click="logout"><img src="/img/icons/log-out.svg"
                                 class="me-2" alt="img">Logout</a>
                     </div>
                 </div>
@@ -190,13 +198,31 @@
             <div class="dropdown-menu dropdown-menu-right">
                 <a class="dropdown-item" href="profile.html">My Profile</a>
                 <a class="dropdown-item" href="generalsettings.html">Settings</a>
-                <a class="dropdown-item" href="signin.html">Logout</a>
+                <a class="dropdown-item" href="#" @click="logout">Logout</a>
             </div>
         </div>
 
     </div>
 </template>
 <script>
-
+import { useAuthStore } from "@/stores/authStore";
+export default {
+    data() {
+        return {
+        }
+    },
+    methods: {
+        async logout() {
+            const authStore = useAuthStore();
+            const token = authStore.user.token;
+            await authStore.logout(token).then(result => {
+                this.$router.push(`/signin`);
+                setTimeout(() => {
+                    this.$router.go(0);
+                }, 1);
+            })
+        },
+    }
+}
 </script>
 <style></style>

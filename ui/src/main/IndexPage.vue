@@ -12,7 +12,7 @@
 </template>
 <script>
 import GlobalLoader from "../common/GlobalLoader.vue";
-import HeaderComponent from "../common/HeaderComponent2.vue";
+import HeaderComponent from "../common/HeaderComponent.vue";
 import SideBar from "../common/SideBar.vue";
 
 export default {
@@ -43,9 +43,10 @@ export default {
       },
     },
   },
-  created() {},
+  created() { },
   mounted() {
     this.$router.push({ path: localStorage.getItem("savedPath") });
+
   },
 };
 </script>
