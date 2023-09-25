@@ -9,7 +9,7 @@ const app = createApp(App);
 app.use(pinia);
 
 const windowLocation = window.location;
-const BASE_URL = `http://${windowLocation.hostname}:8081/api/`;
+const BASE_URL = `http://${windowLocation.hostname}:8083/api/`;
 
 const authStore = useAuthStore();
 const user = authStore.user;
