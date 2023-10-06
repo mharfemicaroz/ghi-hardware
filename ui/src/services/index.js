@@ -33,31 +33,44 @@ const makeRequest = async (method, url, data = {}) => {
   }
 };
 
-export const fetchAllItems = async (url) => {
+const fetchAllItems = async (url) => {
   return makeRequest("get", url);
 };
 
-export const fetchItem = async (url, id) => {
+const fetchItem = async (url, id) => {
   return makeRequest("get", `${url}${id}`);
 };
 
-export const addItem = async (url, data) => {
+const addItem = async (url, data) => {
   data.author = author;
   return makeRequest("post", url, data);
 };
 
-export const editItem = async (url, id, data) => {
+const editItem = async (url, id, data) => {
   return makeRequest("put", `${url}${id}/`, data);
 };
 
-export const deleteItem = async (url, id) => {
+const deleteItem = async (url, id) => {
   return makeRequest("get", `${url}delete/${id}`);
 };
 
-export const filterItems = async (url, data) => {
+const filterItems = async (url, data) => {
   return makeRequest("post", `${url}filter/`, data);
 };
 
-export const saveImage = async (data) => {
+const saveImage = async (data) => {
   return makeRequest("post", "savefile/", data);
+};
+
+export const api = (main, resource) => {
+  const URL = `${main}/${resource}/`;
+  return {
+    fetchAll: async () => fetchAllItems(URL),
+    fetchOne: async (id) => fetchItem(URL, id),
+    add: async (data) => addItem(URL, data),
+    edit: async (id, data) => editItem(URL, id, data),
+    delete: async (id) => deleteItem(URL, id),
+    filter: async (data) => filterItems(URL, data),
+    saveImage: async (data) => saveImage(data),
+  };
 };

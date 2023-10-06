@@ -19,6 +19,7 @@ import EditBrand from "../main/Products/EditBrand.vue";
 import ImportProduct from "../main/Products/ImportProduct.vue";
 import BarCode from "../main/Products/BarCode.vue";
 import SalesList from "../main/Sales/SalesList.vue";
+import SalesAdd from "../main/Sales/SalesAdd.vue";
 import PointofSale from "../main/Sales/PointofSale.vue";
 import SalesreturnList from "../main/Sales/SalesreturnList.vue";
 import NewsalesreturnList from "../main/Sales/NewsalesreturnList.vue";
@@ -160,6 +161,11 @@ const router = createRouter({
           path: "saleslist",
           name: "SalesList",
           component: SalesList,
+        },
+        {
+          path: "salesadd",
+          name: "SalesAdd",
+          component: SalesAdd,
         },
         {
           path: "salesreturnlist",

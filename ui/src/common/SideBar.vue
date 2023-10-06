@@ -156,11 +156,20 @@
                 </router-link>
               </li>
               <li>
+                <router-link
+                  :class="getActiveMenu('/index/salesadd')"
+                  @click="navigateTo('/index/salesadd')"
+                  to="/index/salesadd"
+                >
+                  <span>Add Sales</span>
+                </router-link>
+              </li>
+              <li>
                 <a href="#" @click="openNewTab" to="/pos">
                   <span>POS</span>
                 </a>
               </li>
-              <li>
+              <!-- <li>
                 <router-link
                   :class="getActiveMenu('/index/salesreturnlist')"
                   @click="navigateTo('/index/salesreturnlist')"
@@ -177,7 +186,7 @@
                 >
                   <span>New Sales Return</span>
                 </router-link>
-              </li>
+              </li> -->
             </ul>
           </li>
           <li class="submenu">
@@ -206,7 +215,7 @@
                   <span>Add Purchase</span>
                 </router-link>
               </li>
-              <li>
+              <!-- <li>
                 <router-link
                   :class="getActiveMenu('/index/importpurchase')"
                   @click="navigateTo('/index/importpurchase')"
@@ -214,7 +223,7 @@
                 >
                   <span>Import Purchase</span>
                 </router-link>
-              </li>
+              </li> -->
             </ul>
           </li>
           <li class="submenu">
@@ -263,7 +272,7 @@
               </li>
             </ul>
           </li>
-          <li class="submenu">
+          <!-- <li class="submenu">
             <a href="javascript:void(0);"
               ><img src="/img/icons/quotation1.svg" alt="img" /><span>
                 Quotation</span
@@ -290,8 +299,8 @@
                 </router-link>
               </li>
             </ul>
-          </li>
-          <li class="submenu">
+          </li> -->
+          <!-- <li class="submenu">
             <a href="javascript:void(0);"
               ><img src="/img/icons/transfer1.svg" alt="img" /><span>
                 Transfer</span
@@ -373,7 +382,7 @@
                 </router-link>
               </li>
             </ul>
-          </li>
+          </li> -->
           <li class="submenu">
             <a href="javascript:void(0);"
               ><img src="/img/icons/users1.svg" alt="img" /><span> People</span>
@@ -416,7 +425,7 @@
                   <span>Add Supplier</span>
                 </router-link>
               </li>
-              <li>
+              <!-- <li>
                 <router-link
                   :class="getActiveMenu('/index/userlist')"
                   @click="navigateTo('/index/userlist')"
@@ -424,8 +433,8 @@
                 >
                   <span>User List</span>
                 </router-link>
-              </li>
-              <li>
+              </li> -->
+              <!-- <li>
                 <router-link
                   :class="getActiveMenu('/index/useradd')"
                   @click="navigateTo('/index/useradd')"
@@ -433,8 +442,8 @@
                 >
                   <span>Add User</span>
                 </router-link>
-              </li>
-              <li>
+              </li> -->
+              <!-- <li>
                 <router-link
                   :class="getActiveMenu('/index/storelist')"
                   @click="navigateTo('/index/storelist')"
@@ -442,8 +451,8 @@
                 >
                   <span>Store List</span>
                 </router-link>
-              </li>
-              <li>
+              </li> -->
+              <!-- <li>
                 <router-link
                   :class="getActiveMenu('/index/storeadd')"
                   @click="navigateTo('/index/storeadd')"
@@ -451,7 +460,7 @@
                 >
                   <span>Add Store</span>
                 </router-link>
-              </li>
+              </li> -->
             </ul>
           </li>
           <li class="submenu">

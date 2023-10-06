@@ -11,7 +11,7 @@ from django.core.files.storage import default_storage
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @csrf_exempt
-def filter_model(request, o):
+def filter_model(request, o, s):
     if request.method == 'POST':
         data = request.data
         if isinstance(data, list):
@@ -24,19 +24,22 @@ def filter_model(request, o):
                     queryset = queryset.filter(**{column_name: column_key})
                 else:
                     return JsonResponse({'error': 'Invalid input data.'}, status=400)
-            response_data = list(queryset.values())
+            serializer = s(queryset, many=True)  # Replace YourSerializerClass with the actual serializer class
+            response_data = serializer.data
         else:
             # single entry
             column_name = data.get('columnName')
             column_key = data.get('columnKey')
             if column_name and column_key:
                 queryset = o.objects.filter(**{column_name: column_key})
-                response_data = list(queryset.values())
+                serializer = s(queryset, many=True)  # Replace YourSerializerClass with the actual serializer class
+                response_data = serializer.data
             else:
                 return JsonResponse({'error': 'Invalid input data.'}, status=400)
         return JsonResponse(response_data, safe=False)
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
@@ -99,12 +102,76 @@ def SaveFile(request):
     return JsonResponse(file_name, safe=False)
 
 @csrf_exempt
+def PeopleSupplier_list(request, pk=None):
+    return generic_list(request, PeopleSupplier, PeopleSupplierSerializer, pk)
+
+@csrf_exempt
+def PeopleSupplier_filter(request):
+    return filter_model(request, PeopleSupplier, PeopleSupplierSerializer)
+
+@csrf_exempt
+def PeopleSupplier_delete(request, pk=None):
+    return generic_delete(request, PeopleSupplier, pk)
+
+
+@csrf_exempt
+def PeopleCustomer_list(request, pk=None):
+    return generic_list(request, PeopleCustomer, PeopleCustomerSerializer, pk)
+
+@csrf_exempt
+def PeopleCustomer_filter(request):
+    return filter_model(request, PeopleCustomer, PeopleCustomerSerializer)
+
+@csrf_exempt
+def PeopleCustomer_delete(request, pk=None):
+    return generic_delete(request, PeopleCustomer, pk)
+
+
+@csrf_exempt
+def SalesOrder_list(request, pk=None):
+    return generic_list(request, SalesOrder, SalesOrderSerializer, pk)
+
+@csrf_exempt
+def SalesOrder_filter(request):
+    return filter_model(request, SalesOrder, SalesOrderSerializer)
+
+@csrf_exempt
+def SalesOrder_delete(request, pk=None):
+    return generic_delete(request, SalesOrder, pk)
+
+
+@csrf_exempt
+def SalesItems_list(request, pk=None):
+    return generic_list(request, SalesItems, SalesItemsSerializer, pk)
+
+@csrf_exempt
+def SalesItems_filter(request):
+    return filter_model(request, SalesItems, SalesItemsSerializer)
+
+@csrf_exempt
+def SalesItems_delete(request, pk=None):
+    return generic_delete(request, SalesItems, pk)
+
+
+@csrf_exempt
+def SalesTransaction_list(request, pk=None):
+    return generic_list(request, SalesTransaction, SalesTransactionsSerializer, pk)
+
+@csrf_exempt
+def SalesTransaction_filter(request):
+    return filter_model(request, SalesTransaction, SalesTransactionsSerializer)
+
+@csrf_exempt
+def SalesTransaction_delete(request, pk=None):
+    return generic_delete(request, SalesTransaction, pk)
+
+@csrf_exempt
 def PurchaseOrder_list(request, pk=None):
     return generic_list(request, PurchaseOrder, PurchaseOrderSerializer, pk)
 
 @csrf_exempt
 def PurchaseOrder_filter(request):
-    return filter_model(request, PurchaseOrder)
+    return filter_model(request, PurchaseOrder, PurchaseOrderSerializer)
 
 @csrf_exempt
 def PurchaseOrder_delete(request, pk=None):
@@ -117,7 +184,7 @@ def PurchaseItems_list(request, pk=None):
 
 @csrf_exempt
 def PurchaseItems_filter(request):
-    return filter_model(request, PurchaseItems)
+    return filter_model(request, PurchaseItems, PurchaseItemsSerializer)
 
 @csrf_exempt
 def PurchaseItems_delete(request, pk=None):
@@ -130,7 +197,7 @@ def PurchaseTransaction_list(request, pk=None):
 
 @csrf_exempt
 def PurchaseTransaction_filter(request):
-    return filter_model(request, PurchaseTransaction)
+    return filter_model(request, PurchaseTransaction, PurchaseTransactionsSerializer)
 
 @csrf_exempt
 def PurchaseTransaction_delete(request, pk=None):
@@ -143,7 +210,7 @@ def ProductItem_list(request, pk=None):
 
 @csrf_exempt
 def ProductItem_filter(request):
-    return filter_model(request, ProductItem)
+    return filter_model(request, ProductItem, ProductItemSerializer)
 
 @csrf_exempt
 def ProductItem_delete(request, pk=None):
@@ -157,7 +224,7 @@ def ProductCategory_list(request, pk=None):
 
 @csrf_exempt
 def ProductCategory_filter(request):
-    return filter_model(request, ProductCategory)
+    return filter_model(request, ProductCategory, ProductCategorySerializer)
 
 @csrf_exempt
 def ProductCategory_delete(request, pk=None):
@@ -171,7 +238,7 @@ def ProductSubCategory_list(request, pk=None):
 
 @csrf_exempt
 def ProductSubCategory_filter(request):
-    return filter_model(request, ProductSubCategory)
+    return filter_model(request, ProductSubCategory, ProductSubCategorySerializer)
 
 @csrf_exempt
 def ProductSubCategory_delete(request, pk=None):
@@ -185,7 +252,7 @@ def ProductBrand_list(request, pk=None):
 
 @csrf_exempt
 def ProductBrand_filter(request):
-    return filter_model(request, ProductBrand)
+    return filter_model(request, ProductBrand, ProductBrandSerializer)
 
 @csrf_exempt
 def ProductBrand_delete(request, pk=None):

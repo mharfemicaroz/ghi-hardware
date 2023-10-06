@@ -57,6 +57,22 @@
 
         <table class="table" v-bind:id="uniqueID">
           <thead>
+            <tr v-if="howmanyCheckbox > 0 && batchAction">
+              <th :colspan="mainHeaders.length" style="border: 0px">
+                <slot
+                  name="checkboxtrigger"
+                  :data="{
+                    dt: paginatedMainItems
+                      .filter(function (item) {
+                        return getItemsfromCheckedBoxes.includes(item.id);
+                      })
+                      .map(function (item) {
+                        return item.id;
+                      }),
+                  }"
+                ></slot>
+              </th>
+            </tr>
             <tr>
               <template v-for="(header, index) in mainHeaders" :key="index">
                 <th v-if="header.field === 'toggle' && toggleable">
@@ -67,6 +83,14 @@
                     <span v-if="showAll === false">+</span>
                     <span v-else>-</span>
                   </button>
+                </th>
+                <th v-else-if="header.field === 'checkbox' && selectable">
+                  <input
+                    type="checkbox"
+                    class="form-check-input no-print"
+                    @change="toggleCheckboxes"
+                    :value="mainCheckbox"
+                  />
                 </th>
                 <th
                   v-else
@@ -101,10 +125,18 @@
                     word-wrap: break-word;
                     white-space: normal;
                     overflow: hidden;
-                    max-width: 1px;
+                    max-width: 100%;
                   "
                 >
-                  <template v-if="header.field === 'toggle' && toggleable">
+                  <template v-if="header.field === 'checkbox' && selectable">
+                    <input
+                      type="checkbox"
+                      class="mtCheckbox form-check-input no-print"
+                      :data-id="mainItem.id"
+                      @change="toggleCheckbox"
+                    />
+                  </template>
+                  <template v-else-if="header.field === 'toggle' && toggleable">
                     <button
                       type="button"
                       @click="toggleTable(mainItem.id)"
@@ -132,6 +164,31 @@
                     >
                       <i class="fa fa-eye"></i>
                     </button>
+                    <div v-if="moreAction">
+                      <a
+                        class="me-3 dropset"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        href="javascript:void(0);"
+                        ><img src="/img/icons/ellipise1.svg" alt="img"
+                      /></a>
+                      <ul
+                        class="dropdown-menu"
+                        aria-labelledby="dropdownMenuButton"
+                        data-popper-placement="bottom-end"
+                      >
+                        <li v-for="(btn, index) of this.actionBtns">
+                          <a
+                            href="javascript:void(0);"
+                            class="dropdown-item"
+                            @click="
+                              $emit(`btn-action${index + 1}`, mainItem.id)
+                            "
+                            >{{ btn }}</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
                     <button
                       v-if="this.deletable"
                       type="button"
@@ -140,8 +197,16 @@
                     >
                       <i class="fas fa-trash"></i>
                     </button>
+                    <template v-if="header.slot" class="no-print">
+                      <slot
+                        name="custombtn"
+                        :data="{ h: header.field, dt: mainItem }"
+                      ></slot>
+                    </template>
                   </template>
-                  <template v-else-if="header.field.includes('date')">
+                  <template
+                    v-else-if="header.field.toLowerCase().includes('date')"
+                  >
                     {{ formatDate(new Date(mainItem[header.field])) }}
                   </template>
                   <template v-else>
@@ -422,6 +487,24 @@ export default {
       type: Boolean,
       required: true,
     },
+    selectable: {
+      type: Boolean,
+      required: true,
+    },
+    batchAction: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    moreAction: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    actionBtns: {
+      type: Array,
+      required: false,
+    },
   },
   data() {
     return {
@@ -433,6 +516,9 @@ export default {
       searchText: "",
       sortColumn: null,
       sortDirection: 1,
+      mainCheckbox: false,
+      howmanyCheckbox: 0,
+      getItemsfromCheckedBoxes: [],
     };
   },
   computed: {
@@ -524,6 +610,32 @@ export default {
     },
   },
   methods: {
+    toggleCheckboxes() {
+      this.mainCheckbox = !this.mainCheckbox;
+      jQuery(".mtCheckbox").prop("checked", this.mainCheckbox);
+      this.howmanyCheckbox = jQuery(".mtCheckbox").filter(":checked").length;
+      let dataIds = [];
+      this.getItemsfromCheckedBoxes = [];
+      jQuery(".mtCheckbox")
+        .filter(":checked")
+        .each(function () {
+          var dataId = jQuery(this).data("id");
+          dataIds.push(dataId);
+        });
+      this.getItemsfromCheckedBoxes = dataIds;
+    },
+    toggleCheckbox() {
+      this.howmanyCheckbox = jQuery(".mtCheckbox").filter(":checked").length;
+      let dataIds = [];
+      this.getItemsfromCheckedBoxes = [];
+      jQuery(".mtCheckbox")
+        .filter(":checked")
+        .each(function () {
+          var dataId = jQuery(this).data("id");
+          dataIds.push(dataId);
+        });
+      this.getItemsfromCheckedBoxes = dataIds;
+    },
     sort(field) {
       if (this.sortColumn === field) {
         this.sortDirection = -this.sortDirection;

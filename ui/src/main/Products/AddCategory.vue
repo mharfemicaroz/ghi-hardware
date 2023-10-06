@@ -58,10 +58,7 @@
 </template>
 <script>
 import ToasterComponent from "../../common/ToasterComponent.vue";
-import {
-  productCategoryApi,
-  saveImageProductCategory,
-} from "@/services/productServices";
+import { productCategoryApi } from "@/services/productServices";
 
 export default {
   components: {
@@ -116,7 +113,6 @@ export default {
                       name: this.name,
                       code: this.code,
                       desc: this.desc,
-                      author: this.author,
                       // image_filename: this.imageFileName,
                     });
 

@@ -1,5 +1,9 @@
 <template>
-  <div v-if="show" class="position-fixed top-0 end-0 p-3" style="z-index: 1000">
+  <div
+    v-if="show"
+    class="position-fixed top-0 end-0 p-3"
+    style="z-index: 99999"
+  >
     <div
       id="liveToast"
       :class="`toast show bg-${toastType} text-white`"

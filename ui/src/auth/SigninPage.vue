@@ -19,6 +19,7 @@
                     type="text"
                     placeholder="Enter your username"
                     v-model="username"
+                    :readonly="isAuthenticated"
                   />
                   <img src="/img/icons/users1.svg" alt="img" />
                 </div>
@@ -31,13 +32,20 @@
                     class="pass-input"
                     placeholder="Enter your password"
                     v-model="password"
+                    :readonly="isAuthenticated"
                   />
                   <span class="fas toggle-password fa-eye-slash"></span>
                 </div>
               </div>
 
               <div class="form-login">
-                <button type="submit" class="btn btn-login">Sign In</button>
+                <button
+                  type="submit"
+                  class="btn btn-login"
+                  :disabled="isAuthenticated"
+                >
+                  Sign In
+                </button>
               </div>
             </div>
           </div>
@@ -62,7 +70,7 @@ export default {
     return {
       username: "",
       password: "",
-      isLoading: true,
+      isAuthenticated: false,
     };
   },
   methods: {
@@ -73,11 +81,13 @@ export default {
         password: this.password,
       });
       if (authAccess) {
+        this.isAuthenticated = true;
         localStorage.setItem("savedPath", "/index/dashboard/");
+        this.$refs.toast.showToast("success", "Login successfully!");
         setTimeout(() => {
           this.$router.push(`/index/dashboard/`);
           this.$router.go(0);
-        }, 10000);
+        }, 2000);
       } else {
         // Swal.fire({
         //   title: "Error!",

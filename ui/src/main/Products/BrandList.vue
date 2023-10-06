@@ -117,10 +117,6 @@ export default {
       brands: [],
     };
   },
-  async created() {
-    const response = await productBrandApi.fetchAll();
-    this.brands = response;
-  },
   methods: {
     navigateTo(path, propSidebar = true) {
       // Adding a unique timestamp as a query parameter to force reload

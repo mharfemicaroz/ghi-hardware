@@ -27,26 +27,24 @@ export default {
     };
   },
   watch: {
-    // Watch for route changes
-    $route: {
-      immediate: true, // Run the handler immediately
-      handler() {
-        // Use nextTick to wait until the next DOM update cycle
-        this.$nextTick(() => {
-          this.isLoading = true;
-
-          // Set a timeout of 1000 milliseconds (1 second)
-          setTimeout(() => {
-            this.isLoading = false;
-          }, 1000);
-        });
-      },
-    },
+    // // Watch for route changes
+    // $route: {
+    //   immediate: true, // Run the handler immediately
+    //   handler() {
+    //     // Use nextTick to wait until the next DOM update cycle
+    //     this.$nextTick(() => {
+    //       this.isLoading = true;
+    //       // Set a timeout of 1000 milliseconds (1 second)
+    //       setTimeout(() => {
+    //         this.isLoading = false;
+    //       }, 1000);
+    //     });
+    //   },
+    // },
   },
-  created() { },
+  created() {},
   mounted() {
     this.$router.push({ path: localStorage.getItem("savedPath") });
-
   },
 };
 </script>

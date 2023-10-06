@@ -22,12 +22,36 @@ class PeopleSupplierSerializer(serializers.ModelSerializer):
         model = PeopleSupplier
         fields = '__all__'
 
+class PeopleCustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PeopleCustomer
+        fields = '__all__'
+
 class ProductItemSerializer(serializers.ModelSerializer):
     category_data = ProductCategorySerializer(source='category', read_only=True)
     subcategory_data = ProductSubCategorySerializer(source='subcategory', read_only=True)
     brand_data = ProductBrandSerializer(source='brand', read_only=True)
     class Meta:
         model = ProductItem
+        fields = '__all__'
+
+class SalesOrderSerializer(serializers.ModelSerializer):
+    customer_data = PeopleSupplierSerializer(source='customer', read_only=True)
+    class Meta:
+        model = SalesOrder
+        fields = '__all__'
+
+class SalesItemsSerializer(serializers.ModelSerializer):
+    product_data = ProductItemSerializer(source='product', read_only=True)
+    salesOrder_data = SalesOrderSerializer(source='salesOrder', read_only=True)
+    class Meta:
+        model = SalesItems
+        fields = '__all__'
+
+class SalesTransactionsSerializer(serializers.ModelSerializer):
+    purchaseOrder_data = SalesOrderSerializer(source='salesOrder', read_only=True)
+    class Meta:
+        model = SalesTransaction
         fields = '__all__'
 
 class PurchaseOrderSerializer(serializers.ModelSerializer):
