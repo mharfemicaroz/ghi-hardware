@@ -14,32 +14,136 @@
       </router-link>
     </div>
   </div>
-  <TableComponent
-    :mainHeaders="headers"
-    :mainItems="filteredproducts"
-    :editable="false"
-    :moreAction="true"
-    :actionBtns="['Edit Product', 'View/Set Price']"
-    @btn-action1="editAction"
-    @btn-action2="viewPrice"
-  >
-    <template #content="data">
-      <span
-        v-if="data.data.h === 'isRecentPurchased'"
-        class="badges"
-        :class="getBadgeClass(data.data.dt.isRecentPurchased)"
+  <div class="tabs-set">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link active"
+          id="tab1-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#tab1"
+          type="button"
+          role="tab"
+          aria-controls="tab1"
+          aria-selected="true"
+        >
+          Available
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="tab2-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#tab2"
+          type="button"
+          role="tab"
+          aria-controls="tab2"
+          aria-selected="false"
+        >
+          For Pricing
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="tab3-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#tab3"
+          type="button"
+          role="tab"
+          aria-controls="tab3"
+          aria-selected="false"
+        >
+          Expiring
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="tab4-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#tab4"
+          type="button"
+          role="tab"
+          aria-controls="tab4"
+          aria-selected="false"
+        >
+          Unavailable
+        </button>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div
+        class="tab-pane fade show active"
+        id="tab1"
+        role="tabpanel"
+        aria-labelledby="tab1-tab"
       >
-        {{ data.data.dt.isRecentPurchased ? "Yes" : "No" }}
-      </span>
-      <span
-        v-if="data.data.h === 'status'"
-        class="badges"
-        :class="getBadgeClass(data.data.dt.status)"
+        <TableComponent
+          :mainHeaders="headers"
+          :mainItems="filteredproducts"
+          :editable="false"
+          :moreAction="true"
+          :actionBtns="['Edit Product', 'View/Set Price']"
+          @btn-action1="editAction"
+          @btn-action2="viewPrice"
+        />
+      </div>
+      <div
+        class="tab-pane fade"
+        id="tab2"
+        role="tabpanel"
+        aria-labelledby="tab2-tab"
       >
-        {{ data.data.dt.status }}
-      </span>
-    </template>
-  </TableComponent>
+        <TableComponent
+          :mainHeaders="headers"
+          :mainItems="
+            filteredproducts.filter(
+              (o) => o.status === 'open' && o.isRecentPurchased
+            )
+          "
+          :editable="false"
+          :moreAction="true"
+          :actionBtns="['Edit Product', 'View/Set Price']"
+          @btn-action1="editAction"
+          @btn-action2="viewPrice"
+        />
+      </div>
+      <div
+        class="tab-pane fade"
+        id="tab3"
+        role="tabpanel"
+        aria-labelledby="tab3-tab"
+      >
+        <TableComponent
+          :mainHeaders="headers"
+          :mainItems="filteredproducts.filter((o) => o.status === 'open')"
+          :editable="false"
+          :moreAction="true"
+          :actionBtns="['Edit Product', 'View/Set Price']"
+          @btn-action1="editAction"
+          @btn-action2="viewPrice"
+        />
+      </div>
+      <div
+        class="tab-pane fade"
+        id="tab4"
+        role="tabpanel"
+        aria-labelledby="tab4-tab"
+      >
+        <TableComponent
+          :mainHeaders="headers"
+          :mainItems="filteredproducts.filter((o) => o.status !== 'open')"
+          :editable="false"
+          :moreAction="true"
+          :actionBtns="['Edit Product', 'View/Set Price']"
+          @btn-action1="editAction"
+          @btn-action2="viewPrice"
+        />
+      </div>
+    </div>
+  </div>
   <ToasterComponent ref="toast" />
   <div
     class="modal fade show"
@@ -464,6 +568,11 @@ export default {
       },
       headers: [
         {
+          label: "",
+          field: "checkbox",
+          sortable: false,
+        },
+        {
           label: "Item",
           field: "name",
           sortable: true,
@@ -507,18 +616,6 @@ export default {
           label: "Created By",
           field: "author",
           sortable: true,
-        },
-        {
-          label: "PurchasedRecently",
-          field: "isRecentPurchased",
-          sortable: true,
-          slot: true,
-        },
-        {
-          label: "Status",
-          field: "status",
-          sortable: true,
-          slot: true,
         },
         {
           label: "",
@@ -605,16 +702,13 @@ export default {
       this.product.price = this.newprice;
       this.product.isRecentPurchased = false;
       await productItemApi.edit(this.productId, this.product);
-      const purchasedata = (
-        await purchaseItemApi.filter({
-          columnName: "product_id",
-          columnKey: this.productId,
-        })
-      )
-        .filter((o) => parseFloat(o.sellingPrice) === 0)
-        .sort((a, b) => {
-          return new Date(b.created) - new Date(a.created);
-        })[0];
+      const data = await purchaseItemApi.filter({
+        columnName: "product_id",
+        columnKey: this.productId,
+      });
+      const purchasedata = data.sort((a, b) => {
+        return new Date(b.created) - new Date(a.created);
+      })[0];
       const purchaseItemID = purchasedata.id;
       await purchaseItemApi.edit(purchaseItemID, {
         ...purchasedata,
@@ -673,6 +767,10 @@ export default {
         });
       } else {
         this.pricehistory = [];
+        this.$refs.toast.showToast(
+          "warning",
+          "This product has no recent purchases."
+        );
       }
     },
     async saveAction() {

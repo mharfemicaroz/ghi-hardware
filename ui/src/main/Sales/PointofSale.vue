@@ -407,7 +407,8 @@
                               isClickTax ||
                               amountPaid === 0 ||
                               salesBook.length === 0 ||
-                              amountPaid !== netTotal
+                              itemStatus.findIndex((o) => o) !== -1 ||
+                              parseFloat(amountPaid) <= parseFloat(netTotal)
                             "
                             class="btn btn-primary"
                             type="submit"
@@ -558,6 +559,18 @@ export default {
       return `${randomString}-${numericDate}`;
     },
     async payOrder() {
+      const result = await this.$swal.fire({
+        icon: "warning",
+        title: "Are you sure you want to submit this sale?",
+        text: " This cannot be undone.",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        showCancelButton: true,
+      });
+
+      if (!result.isConfirmed) {
+        return false;
+      }
       await salesOrderApi
         .filter({
           columnName: "refno",
@@ -605,11 +618,28 @@ export default {
                       tax: 0,
                       totalCost: item.totalCost,
                     });
+                    const data = await productItemApi.fetchOne(item.id);
+                    const product_data = {
+                      ...data,
+                      qty:
+                        parseFloat(data.qty) -
+                        parseFloat(
+                          this.book.qty[
+                            this.salesBook.findIndex(
+                              (o) => o.name === data.name
+                            )
+                          ]
+                        ),
+                    };
+                    await productItemApi.edit(item.id, product_data);
                   }
                   await salesTransactionApi.add({
                     cost: this.amountPaid,
                     balance: 0,
-                    amountPaid: this.amountPaid,
+                    amountPaid:
+                      this.amountPaid > this.netTotal
+                        ? this.netTotal
+                        : this.amountPaid,
                     status: "full",
                     refno:
                       this.paymentMode +
@@ -708,6 +738,8 @@ export default {
       const productId = matchingProduct?.id;
       const productName = matchingProduct?.name;
       const productPrice = matchingProduct?.price;
+      const productMaxQty = matchingProduct?.qty || 0;
+      const productMinQty = matchingProduct?.minqty || 0;
       this.salesBook.unshift({
         id: productId,
         name: productName,
@@ -715,6 +747,8 @@ export default {
         qty: 1,
         discountPercent: 0,
         totalCost: productPrice,
+        productMaxQty: productMaxQty,
+        productMinQty: productMinQty,
       });
       ["qty", "price", "discountPercent"].forEach((prop) => {
         const entry =
