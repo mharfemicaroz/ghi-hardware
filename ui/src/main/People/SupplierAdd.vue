@@ -127,9 +127,6 @@ export default {
 
                     localStorage.setItem("savedPath", "/index/supplierlist/");
                     this.$router.push(`/index/supplierlist/`);
-                    setTimeout(() => {
-                      this.$router.go(0);
-                    }, 1);
                   } catch (error) {
                     console.error(error);
                   }
@@ -145,7 +142,7 @@ export default {
       const isSidebar = propSidebar || true;
       localStorage.setItem("savedPath", path);
       localStorage.setItem("propSidebar", isSidebar);
-      this.$router.go(0);
+      tthis.$router.push(path);
     },
   },
 };

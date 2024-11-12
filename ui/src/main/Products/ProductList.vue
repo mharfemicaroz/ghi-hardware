@@ -69,6 +69,20 @@
           aria-controls="tab4"
           aria-selected="false"
         >
+          For Purchase
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="tab5-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#tab5"
+          type="button"
+          role="tab"
+          aria-controls="tab5"
+          aria-selected="false"
+        >
           Unavailable
         </button>
       </li>
@@ -82,12 +96,17 @@
       >
         <TableComponent
           :mainHeaders="headers"
-          :mainItems="filteredproducts"
+          :mainItems="
+            filteredproducts.filter(
+              (o) => o.status === 'open' && !o.isRecentPurchased
+            )
+          "
           :editable="false"
           :moreAction="true"
-          :actionBtns="['Edit Product', 'View/Set Price']"
+          :actionBtns="['Edit Product', 'View/Set Price', 'Add Voucher']"
           @btn-action1="editAction"
           @btn-action2="viewPrice"
+          @btn-action3="addVoucher"
         />
       </div>
       <div
@@ -97,7 +116,7 @@
         aria-labelledby="tab2-tab"
       >
         <TableComponent
-          :mainHeaders="headers"
+          :mainHeaders="headerswcheckbox"
           :mainItems="
             filteredproducts.filter(
               (o) => o.status === 'open' && o.isRecentPurchased
@@ -105,10 +124,23 @@
           "
           :editable="false"
           :moreAction="true"
-          :actionBtns="['Edit Product', 'View/Set Price']"
+          :actionBtns="['Edit Product', 'View/Set Price', 'Add Voucher']"
           @btn-action1="editAction"
           @btn-action2="viewPrice"
-        />
+          @btn-action3="addVoucher"
+          :selectable="true"
+          :batchAction="true"
+        >
+          <template #checkboxtrigger="data">
+            <button
+              type="button"
+              class="btn btn-sm btn-primary text-white"
+              @click="batchAction(data.data.dt)"
+            >
+              Batch Price Setting
+            </button>
+          </template>
+        </TableComponent>
       </div>
       <div
         class="tab-pane fade"
@@ -117,8 +149,8 @@
         aria-labelledby="tab3-tab"
       >
         <TableComponent
-          :mainHeaders="headers"
-          :mainItems="filteredproducts.filter((o) => o.status === 'open')"
+          :mainHeaders="extendheaders"
+          :mainItems="expiredfilteredproducts"
           :editable="false"
           :moreAction="true"
           :actionBtns="['Edit Product', 'View/Set Price']"
@@ -131,6 +163,44 @@
         id="tab4"
         role="tabpanel"
         aria-labelledby="tab4-tab"
+      >
+        <div class="col-lg-4">
+          <div class="form-group">
+            <select class="form-select" v-model="threshold" required>
+              <option value="">
+                Choose the inventory quantity threshold percentage
+              </option>
+              <option value="0">0%</option>
+              <option value="5">5%</option>
+              <option value="10">10%</option>
+              <option value="20">20%</option>
+              <option value="30">30%</option>
+              <option value="40">40%</option>
+              <option value="50">50%</option>
+              <option value="60">60%</option>
+              <option value="70">70%</option>
+              <option value="80">80%</option>
+              <option value="90">90%</option>
+              <option value="100">100%</option>
+            </select>
+          </div>
+        </div>
+
+        <TableComponent
+          :mainHeaders="headers"
+          :mainItems="forpurchasedfilteredproducts"
+          :editable="false"
+          :moreAction="true"
+          :actionBtns="['Edit Product', 'View/Set Price']"
+          @btn-action1="editAction"
+          @btn-action2="viewPrice"
+        />
+      </div>
+      <div
+        class="tab-pane fade"
+        id="tab5"
+        role="tabpanel"
+        aria-labelledby="tab5-tab"
       >
         <TableComponent
           :mainHeaders="headers"
@@ -281,13 +351,34 @@
                   />
                 </div>
               </div>
-              <div class="col-lg-12">
+              <div class="col-lg-3 col-sm-6 col-12">
+                <div class="form-group">
+                  <label>Manufacturing Date </label>
+                  <div class="input-groupicon">
+                    <input
+                      type="date"
+                      class="form-control"
+                      v-model="product.manufacturingDate"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-3 col-sm-6 col-12">
+                <div class="form-group">
+                  <label>Expiration Date </label>
+                  <div class="input-groupicon">
+                    <input
+                      type="date"
+                      class="form-control"
+                      v-model="product.expirationDate"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6 col-sm-6 col-12">
                 <div class="form-group">
                   <label>Description</label>
-                  <textarea
-                    class="form-control"
-                    v-model="product.desc"
-                  ></textarea>
+                  <input type="text" v-model="product.desc" required />
                 </div>
               </div>
               <div class="col-lg-3 col-sm-6 col-12">
@@ -365,6 +456,130 @@
               </div>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="modal fade show"
+    id="batchpriceModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="batchpriceModalLabel"
+    style="display: none; padding-right: 17px"
+    aria-modal="true"
+  >
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content" style="">
+        <div class="modal-header">
+          <h4 class="modal-title" id="batchpriceModalLabel">
+            Batch Price Setting Module
+          </h4>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-lg-9 col-sm-6 col-12">
+              <div
+                class="table-responsive"
+                style="
+                  height: fit-content;
+                  max-height: 300px;
+                  overflow-y: auto;
+                  overflow-x: hidden;
+                "
+              >
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Price</th>
+                      <th>Selling Price</th>
+                      <th>Profit</th>
+                      <th>Markup %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item of filteredbatchitems">
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.price }}</td>
+                      <td>{{ item.sellingPrice }}</td>
+                      <td>{{ item.difference }}</td>
+                      <td>{{ item.percentage }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-12">
+              <form id="priceForm" @submit.prevent="setMarkup">
+                <div class="row">
+                  <div class="col-lg-12 float-md-right mb-0">
+                    <div class="total-order mb-0 mt-0">
+                      <ul>
+                        <li class="markup" @click="newmarkup = 5">
+                          <h4>Markup @ 5%</h4>
+                          <h5>-</h5>
+                        </li>
+                        <li class="markup" @click="newmarkup = 10">
+                          <h4>Markup @ 10%</h4>
+                          <h5>-</h5>
+                        </li>
+                        <li class="markup" @click="newmarkup = 20">
+                          <h4>Markup @ 20%</h4>
+                          <h5>-</h5>
+                        </li>
+                        <li class="markup" @click="newmarkup = 30">
+                          <h4>Markup @ 30%</h4>
+                          <h5>-</h5>
+                        </li>
+                        <li class="markup" @click="newmarkup = 40">
+                          <h4>Markup @ 40%</h4>
+                          <h5>-</h5>
+                        </li>
+                        <li class="markup" @click="newmarkup = 50">
+                          <h4>Markup @ 50%</h4>
+                          <h5>-</h5>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group">
+                    <label>Markup</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      v-model="newmarkup"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <button type="submit" class="btn btn-submit me-2">Set</button>
+                  <a
+                    href="javascript:void(0);"
+                    class="btn btn-cancel"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    Cancel
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -531,6 +746,107 @@
       </div>
     </div>
   </div>
+  <div
+    class="modal fade show"
+    id="voucherModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="voucherModalLabel"
+    style="display: none; padding-right: 17px"
+    aria-modal="true"
+  >
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content" style="">
+        <div class="modal-header">
+          <h4 class="modal-title" id="voucherModalLabel">Voucher(s) Module</h4>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-lg-9 col-sm-6 col-12">
+              <div
+                class="table-responsive"
+                style="
+                  height: fit-content;
+                  max-height: 300px;
+                  overflow-y: auto;
+                  overflow-x: hidden;
+                "
+              >
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Desc</th>
+                      <th>Code</th>
+                      <th>Start Date</th>
+                      <th>Expiration Date</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item of voucherlists">
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.desc }}</td>
+                      <td>{{ item.code }}</td>
+                      <td>{{ item.startDate }}</td>
+                      <td>{{ item.expirationDate }}</td>
+                      <td>
+                        <button
+                          class="btn btn-small badge badge-pill btn-danger"
+                          type="button"
+                          @click="deleteVoucherItem(item.id)"
+                        >
+                          <i class="fa fa-times"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-12">
+              <form id="voucherForm" @submit.prevent="setVoucher">
+                <div class="row">
+                  <div class="form-group">
+                    <label>Voucher</label>
+                    <select class="form-control" v-model="voucher" required>
+                      <option value="">Choose</option>
+                      <option
+                        v-for="(item, index) in filteredvouchers"
+                        :key="index"
+                        :value="item.id"
+                      >
+                        {{ item.code }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <button type="submit" class="btn btn-submit me-2">Add</button>
+                  <a
+                    href="javascript:void(0);"
+                    class="btn btn-cancel"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    Cancel
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 import ToasterComponent from "../../common/ToasterComponent.vue";
@@ -540,6 +856,8 @@ import {
   productCategoryApi,
   productBrandApi,
   productItemApi,
+  productVoucherApi,
+  productVoucherItemApi,
 } from "@/services/productServices";
 import { purchaseItemApi } from "@/services/purchaseServices";
 export default {
@@ -550,6 +868,7 @@ export default {
   data() {
     return {
       productId: null,
+      threshold: 0,
       product: {
         category: "",
         subcategory: "",
@@ -564,14 +883,11 @@ export default {
         discount: 0,
         price: 0,
         status: "",
+        manufacturingDate: "",
+        expirationDate: "",
         latestPrice: 0,
       },
       headers: [
-        {
-          label: "",
-          field: "checkbox",
-          sortable: false,
-        },
         {
           label: "Item",
           field: "name",
@@ -613,11 +929,6 @@ export default {
           sortable: true,
         },
         {
-          label: "Created By",
-          field: "author",
-          sortable: true,
-        },
-        {
           label: "",
           field: "action",
           sortable: false,
@@ -628,15 +939,80 @@ export default {
       subcategories: [],
       brands: [],
       products: [],
+      batchitems: [],
+      vouchers: [],
+      voucherlists: [],
       imageFile: null,
       imageFileName: "",
+      voucher: "",
       newprice: 0,
+      newmarkup: 0,
     };
   },
   computed: {
     filteredSubcategories() {
       return this.subcategories.filter((item) => {
         return item.category === this.product.category;
+      });
+    },
+    headerswcheckbox() {
+      return [
+        {
+          label: "",
+          field: "checkbox",
+          sortable: false,
+        },
+        ...this.headers,
+      ];
+    },
+    extendheaders() {
+      const indexToInsertBefore = this.headers.length - 1;
+      return [
+        ...this.headers.slice(0, indexToInsertBefore),
+        {
+          label: "Expired in",
+          field: "expiredin",
+          sortable: true,
+        },
+        ...this.headers.slice(indexToInsertBefore),
+      ];
+    },
+    filteredvouchers() {
+      return this.vouchers.map((o) => {
+        let code = "";
+
+        if (o.discountPercentage == 0 && o.discount == 0) {
+          code = `Special Price Offer: ${parseFloat(o.specialPrice)}`;
+        } else if (o.discount == 0 && o.specialPrice == 0) {
+          code = `Flexi - ${parseFloat(o.discountPercentage)}% off`;
+        } else if (o.specialPrice == 0 && o.discountPercentage == 0) {
+          code = `Fix - ${o.discount} off`;
+        } else {
+          // Handle other cases here if needed
+          code = "Other Case";
+        }
+        return {
+          ...o,
+          code: "(" + o.name + ") " + code,
+        };
+      });
+    },
+    filteredbatchitems() {
+      return this.batchitems.map((item) => {
+        const sellingPrice = (
+          item.price *
+          (1 + parseFloat(this.newmarkup / 100))
+        ).toFixed(2);
+        const percentage = this.newmarkup.toFixed(2);
+        const difference = (
+          parseFloat(sellingPrice) - parseFloat(item.price)
+        ).toFixed(2);
+        return {
+          ...item,
+          sellingPrice: sellingPrice,
+          percentage: percentage,
+          difference: difference,
+        };
       });
     },
     filteredproducts() {
@@ -646,6 +1022,7 @@ export default {
           const subcategoryName = o.subcategory_data.name;
           const brandName =
             o.brand_data !== null ? o.brand_data.name : "No Brand";
+
           return {
             ...o,
             categoryName: categoryName,
@@ -654,7 +1031,60 @@ export default {
           };
         })
         .sort((a, b) => {
-          return b.isRecentPurchased - a.isRecentPurchased;
+          const p = a.name;
+          const q = b.name;
+          if (p < q) {
+            return -1;
+          }
+          if (p > q) {
+            return 1;
+          }
+          return 0;
+        });
+    },
+    forpurchasedfilteredproducts() {
+      if (this.threshold === "") {
+        return [];
+      }
+      return this.filteredproducts
+        .map((o) => {
+          const threshold = Math.floor(
+            parseFloat(o.minqty) +
+              (parseFloat(o.qty) + 1) *
+                (parseFloat(this.threshold) === 0
+                  ? 0
+                  : parseFloat(this.threshold) / 100)
+          );
+          return {
+            ...o,
+            threshold: threshold,
+          };
+        })
+        .filter((o) => parseFloat(o.qty) <= parseFloat(o.threshold));
+    },
+    expiredfilteredproducts() {
+      const today = new Date(new Date().setHours(0, 0, 0, 0));
+      const sevenDaysLater = new Date(today);
+      sevenDaysLater.setDate(today.getDate() + 7);
+
+      return this.filteredproducts
+        .filter((o) => {
+          const isOpen = o.status === "open";
+          const isExpiringWithin7Days =
+            new Date(new Date(o.expirationDate).setHours(0, 0, 0, 0)) <=
+              sevenDaysLater &&
+            new Date(new Date(o.expirationDate).setHours(0, 0, 0, 0)) >= today;
+
+          return isOpen && isExpiringWithin7Days;
+        })
+        .map((o) => {
+          const expiredin = Math.floor(
+            (new Date(o.expirationDate) - new Date()) / (1000 * 60 * 60 * 24)
+          );
+          return {
+            ...o,
+            expiredin: expiredin + " day(s)",
+          };
         });
     },
   },
@@ -671,7 +1101,36 @@ export default {
       const isSidebar = propSidebar || true;
       localStorage.setItem("savedPath", path);
       localStorage.setItem("propSidebar", isSidebar);
-      this.$router.go(0);
+      this.$router.push(path);
+    },
+    async deleteVoucherItem(id) {
+      await productVoucherItemApi.delete(id);
+      this.viewVoucher();
+    },
+    async setVoucher() {
+      const response = await productVoucherItemApi.filter([
+        {
+          columnName: "product_id",
+          columnKey: this.productId,
+        },
+        {
+          columnName: "voucher_id",
+          columnKey: this.voucher,
+        },
+      ]);
+      if (response.length > 0) {
+        this.$refs.toast.showToast(
+          "danger",
+          "Using the same voucher on the same item is not allowed."
+        );
+        return false;
+      }
+      await productVoucherItemApi.add({
+        product: this.productId,
+        voucher: this.voucher,
+      });
+      this.voucher = "";
+      this.viewVoucher();
     },
     getBadgeClass(status) {
       return {
@@ -679,23 +1138,62 @@ export default {
         "bg-lightred": status === false || status === "close",
       };
     },
-    resetValues() {
-      this.category = "";
-      this.subcategory = "";
-      this.brand = "";
-      this.name = "";
-      this.desc = "";
-      this.unit = "";
-      this.sku = "";
-      this.minqty = 0;
-      this.qty = 0;
-      this.tax = 0;
-      this.discount = 0;
-      this.price = 0;
-      this.status = "";
-      this.imageFile = null;
-      this.imageFileName = "";
-      this.latestPrice = 0;
+    async viewVoucher() {
+      this.voucherlists = (
+        await productVoucherItemApi.filter({
+          columnName: "product_id",
+          columnKey: this.productId,
+        })
+      )
+        .map((o) => {
+          let code = "";
+
+          if (
+            o.voucher_data.discountPercentage == 0 &&
+            o.voucher_data.discount == 0
+          ) {
+            code = `Special Price Offer: ${parseFloat(
+              o.voucher_data.specialPrice
+            )}`;
+          } else if (
+            o.voucher_data.discount == 0 &&
+            o.voucher_data.specialPrice == 0
+          ) {
+            code = `Flexi - ${parseFloat(
+              o.voucher_data.discountPercentage
+            )}% off`;
+          } else if (
+            o.voucher_data.specialPrice == 0 &&
+            o.voucher_data.discountPercentage == 0
+          ) {
+            code = `Fix - ${o.voucher_data.discount} off`;
+          } else {
+            // Handle other cases here if needed
+            code = "Other Case";
+          }
+          return {
+            ...o,
+            name: o.voucher_data.name,
+            desc: o.voucher_data.desc,
+            startDate: o.voucher_data.startDate.replace("T00:00:00Z", ""),
+            expirationDate: o.voucher_data.expirationDate.replace(
+              "T00:00:00Z",
+              ""
+            ),
+            discountPercentage: o.voucher_data.discountPercentage,
+            discount: o.voucher_data.discount,
+            specialPrice: o.voucher_data.specialPrice,
+            code: "(" + o.voucher_data.name + ") " + code,
+          };
+        })
+        .sort((a, b) => {
+          return new Date(a.expirationDate) - new Date(b.expirationDate);
+        });
+    },
+    async addVoucher(id) {
+      jQuery("#voucherModal").modal("toggle");
+      this.productId = id;
+      this.viewVoucher();
     },
     async setPrice() {
       jQuery("#priceModal").modal("toggle");
@@ -715,6 +1213,48 @@ export default {
         sellingPrice: this.newprice,
       });
       this.loadData();
+    },
+    async setMarkup() {
+      for (const item of this.batchitems) {
+        const productData = await productItemApi.fetchOne(item.product_id);
+        const newprice = item.price * (1 + parseFloat(this.newmarkup) / 100);
+        productData.price = newprice;
+        productData.isRecentPurchased = false;
+        await productItemApi.edit(item.product_id, productData);
+
+        const purchasedata = await purchaseItemApi.fetchOne(item.id);
+        purchasedata.sellingPrice = newprice;
+        await purchaseItemApi.edit(item.id, purchasedata);
+      }
+      this.loadData();
+      jQuery("#batchpriceModal").modal("toggle");
+    },
+    async batchAction(items) {
+      this.newmarkup = 0;
+      this.batchitems = [];
+      for (const id of items) {
+        const response = await purchaseItemApi.filter({
+          columnName: "product_id",
+          columnKey: id,
+        });
+        const purchasedata = response.sort((a, b) => {
+          return new Date(b.created) - new Date(a.created);
+        });
+        if (purchasedata.length > 0) {
+          const recentData = purchasedata[0];
+          const productName = this.products.find((o) => o.id === id).name;
+          this.batchitems.push({
+            id: recentData.id,
+            product_id: id,
+            name: productName,
+            price: recentData.price,
+            sellingPrice: 0,
+            difference: 0,
+            percentage: 0,
+          });
+        }
+      }
+      jQuery("#batchpriceModal").modal("toggle");
     },
     async viewPrice(id) {
       const response = await productItemApi.fetchOne(id);
@@ -807,6 +1347,12 @@ export default {
         category: response.category,
         subcategory: response.subcategory || "",
         brand: response.brand || "",
+        manufacturingDate: response.manufacturingDate
+          ? response.manufacturingDate.toString().replace("T00:00:00Z", "")
+          : null,
+        expirationDate: response.expirationDate
+          ? response.expirationDate.toString().replace("T00:00:00Z", "")
+          : null,
       };
     },
     async loadData() {
@@ -817,6 +1363,7 @@ export default {
     this.categories = await productCategoryApi.fetchAll();
     this.subcategories = await productSubCategoryApi.fetchAll();
     this.brands = await productBrandApi.fetchAll();
+    this.vouchers = await productVoucherApi.fetchAll();
     this.loadData();
   },
 };

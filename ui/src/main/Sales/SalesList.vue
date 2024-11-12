@@ -922,7 +922,7 @@ export default {
         });
       };
 
-      inputField.addEventListener("input", function () {
+      inputField?.addEventListener("input", function () {
         const value = this.value;
         closeAllLists();
         if (!value) return;
@@ -956,7 +956,7 @@ export default {
         });
       });
 
-      inputField.addEventListener("keydown", function (e) {
+      inputField?.addEventListener("keydown", function (e) {
         const autoCompleteItems = document
           .getElementById(inputField.id + "autocomplete-list")
           ?.querySelectorAll("div");

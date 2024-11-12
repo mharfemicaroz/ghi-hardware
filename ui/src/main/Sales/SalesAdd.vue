@@ -253,7 +253,11 @@
                 <label>Qty</label>
                 <input
                   type="number"
-                  min="0"
+                  min="1"
+                  :max="
+                    parseFloat(product.productMaxQty) -
+                    parseFloat(product.productMinQty)
+                  "
                   step="1"
                   v-model="product.qty"
                   class="form-control"
@@ -473,9 +477,6 @@ export default {
 
               localStorage.setItem("savedPath", "/index/saleslist/");
               this.$router.push(`/index/saleslist/`);
-              setTimeout(() => {
-                this.$router.go(0);
-              }, 1);
             } catch (error) {
               console.error(error);
             }
@@ -486,7 +487,7 @@ export default {
       const isSidebar = propSidebar || true;
       localStorage.setItem("savedPath", path);
       localStorage.setItem("propSidebar", isSidebar);
-      this.$router.go(0);
+      this.$router.push(path);
     },
     deleteItem(name) {
       const index = this.salesBook.findIndex((item) => item.name === name);
@@ -508,9 +509,13 @@ export default {
         document.getElementById("productItems").value = "";
         return false;
       }
-      const productPrice = this.products.find((o) =>
-        o.name.toLowerCase().includes(query.toLowerCase())
-      ).price;
+      const productData = this.products.find(
+        (o) => o.name.toLowerCase() === query.toLowerCase()
+      );
+      const productId = productData?.id || -1;
+      const productPrice = productData?.price || 0;
+      const productMaxQty = productData?.qty || 0;
+      const productMinQty = productData?.minqty || 0;
       this.product = {
         name: query,
         qty: 0,
@@ -519,11 +524,24 @@ export default {
         discountPercent: 0,
         tax: 0,
         taxPercent: 0,
+        productMinQty: productMinQty,
+        productMaxQty: productMaxQty,
       };
       jQuery("#itemModal").modal("toggle");
       document.getElementById("productItems").value = "";
     },
     insertItem() {
+      if (
+        this.product.qty <= 0 ||
+        parseFloat(this.product.productMaxQty) - parseFloat(this.product.qty) <
+          parseFloat(this.product.productMinQty)
+      ) {
+        this.$refs.toast.showToast(
+          "danger",
+          "Product quantity is out of range."
+        );
+        return false;
+      }
       jQuery("#itemModal").modal("toggle");
       const totalCost =
         parseFloat(this.product.qty) * parseFloat(this.product.price);

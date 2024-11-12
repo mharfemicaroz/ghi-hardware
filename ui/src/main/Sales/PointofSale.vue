@@ -67,7 +67,9 @@
                             <td>
                               <a href="javascript:void(0);">{{ item.name }}</a>
                             </td>
-                            <td class="text-center">{{ item.price }}</td>
+                            <td class="text-center">
+                              {{ item.price }}
+                            </td>
                             <td
                               style="
                                 width: 100px;
@@ -83,6 +85,10 @@
                                 class="form-control"
                                 type="number"
                                 min="1"
+                                :max="
+                                  parseFloat(item.productMaxQty) -
+                                  parseFloat(item.productMinQty)
+                                "
                                 step="1"
                                 v-model="book.qty[index]"
                               />
@@ -193,7 +199,11 @@
                 <div class="card mb-0">
                   <div class="card-body text-center">
                     <span>
-                      <button type="button" class="btn btn-light">
+                      <button
+                        type="button"
+                        class="btn btn-light"
+                        @click="toggleHelp"
+                      >
                         <i class="fa fa-question"></i>
                       </button>
                     </span>
@@ -441,13 +451,72 @@
       </div>
     </div>
   </div>
+  <ToasterComponent ref="toast" />
   <!-- Modals -->
+  <div
+    class="modal fade show"
+    id="helpModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="helpModalLabel"
+    style="display: none; padding-right: 17px"
+    aria-modal="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" style="">
+        <div class="modal-header">
+          <h4 class="modal-title" id="helpModalLabel">Help shortcuts</h4>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered table-striped">
+            <thead class="thead-light">
+              <tr>
+                <th>Shortcut</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>Num</kbd></td>
+                <td>Quantity of Item x Number (Quantity Multiplier)</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>Num</kbd></td>
+                <td>Quantity of Item + Number (Quantity Addition)</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd> + <kbd>Shift</kbd> +<kbd>Num</kbd></td>
+                <td>Quantity of Item - Number (Quantity Substraction)</td>
+              </tr>
+              <tr style="background-color: #f7f7f7; font-size: 0.8em">
+                <td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>3</kbd></td>
+                <td>Example: Decreases the Quantity of Item by 3 units</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
+import ToasterComponent from "../../common/ToasterComponent.vue";
 import GlobalLoader from "../../common/GlobalLoader.vue";
 import HeaderComponent from "../../common/HeaderComponent.vue";
 import { peopleCustomerApi } from "@/services/PeopleServices";
-import { productItemApi } from "@/services/ProductServices";
+import {
+  productItemApi,
+  productVoucherApi,
+  productVoucherItemApi,
+} from "@/services/ProductServices";
 import {
   salesOrderApi,
   salesItemApi,
@@ -457,6 +526,7 @@ export default {
   components: {
     GlobalLoader,
     HeaderComponent,
+    ToasterComponent,
   },
   data() {
     return {
@@ -520,6 +590,63 @@ export default {
     },
   },
   methods: {
+    toggleHelp() {
+      jQuery("#helpModal").modal("toggle");
+    },
+    handleKeyPress(event) {
+      if (!event.ctrlKey && !event.shiftKey && !event.altKey) return false;
+      event.preventDefault();
+
+      if (this.salesBook.length === 0) return false;
+
+      let newqty = parseFloat(this.book.qty[0]);
+      let numberKey = this.getNumberFromKeyCode(event.keyCode);
+
+      if (numberKey === null) return false; // Key pressed was not a number key
+
+      if (event.ctrlKey) {
+        newqty *= numberKey;
+      } else if (event.altKey) {
+        let adjustment = event.shiftKey ? -numberKey : numberKey;
+        newqty += adjustment;
+      } else {
+        return false; // Neither Ctrl nor Alt pressed
+      }
+
+      if (!this.isValidQuantity(newqty)) {
+        this.$refs.toast.showToast(
+          "danger",
+          "Product quantity is out of range."
+        );
+        return false;
+      }
+
+      this.updateQuantity(newqty);
+    },
+
+    getNumberFromKeyCode(keyCode) {
+      if (
+        (keyCode >= 48 && keyCode <= 57) ||
+        (keyCode >= 96 && keyCode <= 105)
+      ) {
+        return keyCode <= 57 ? keyCode - 48 : keyCode - 96;
+      }
+      return null;
+    },
+
+    isValidQuantity(qty) {
+      return !(
+        qty === "" ||
+        (qty > 1 && qty < parseFloat(this.salesBook[0].productMinQty))
+      );
+    },
+
+    updateQuantity(newqty) {
+      this.book.qty[0] = newqty;
+      this.salesBook[0].qty = newqty;
+      this.salesBook[0].totalCost = this.calculateNewCost(0);
+    },
+
     async loaddata() {
       this.customers = await peopleCustomerApi.fetchAll();
       this.products = await productItemApi.fetchAll();
@@ -718,7 +845,7 @@ export default {
     editItem(index) {
       this.itemStatus[index] = true;
     },
-    insertItem() {
+    async insertItem() {
       const query = document.getElementById("productItems").value;
       const isExist =
         this.products.filter((o) =>
@@ -737,9 +864,58 @@ export default {
       );
       const productId = matchingProduct?.id;
       const productName = matchingProduct?.name;
-      const productPrice = matchingProduct?.price;
+      let productPrice = matchingProduct?.price;
+      const origprice = productPrice;
       const productMaxQty = matchingProduct?.qty || 0;
       const productMinQty = matchingProduct?.minqty || 0;
+
+      const voucherItems_data = await productVoucherItemApi.filter({
+        columnName: "product_id",
+        columnKey: productId,
+      });
+
+      const activeVoucherItems = voucherItems_data.filter((o) => {
+        const today = new Date().setHours(0, 0, 0, 0);
+        const isActive =
+          new Date(o.voucher_data.startDate).setHours(0, 0, 0, 0) <= today &&
+          today <= new Date(o.voucher_data.expirationDate).setHours(0, 0, 0, 0);
+        return isActive;
+      });
+
+      const isSPexist = activeVoucherItems.findIndex(
+        (o) => o.voucher_data.mode == 2
+      );
+      if (isSPexist !== -1) {
+        const minSP = activeVoucherItems
+          .filter((o) => o.voucher_data.mode == 2)
+          .sort((a, b) => {
+            return (
+              parseFloat(a.voucher_data.specialPrice) -
+              parseFloat(b.voucher_data.specialPrice)
+            );
+          });
+        productPrice = parseFloat(minSP[0].voucher_data.specialPrice);
+      }
+
+      for (const item of activeVoucherItems.filter(
+        (o) => o.voucher_data.mode !== 2
+      )) {
+        const mode = item.voucher_data.mode;
+        const discountPercentage = item.voucher_data.discountPercentage;
+        const discount = item.voucher_data.discount;
+
+        if (mode == 0) {
+          productPrice =
+            productPrice * (1 - parseFloat(discountPercentage) / 100);
+        } else if (mode == 1) {
+          productPrice = productPrice - parseFloat(discount);
+        }
+      }
+
+      if (productPrice < 0) {
+        productPrice = origprice;
+      }
+
       this.salesBook.unshift({
         id: productId,
         name: productName,
@@ -767,12 +943,24 @@ export default {
       });
     },
     async saveItem(id, index) {
+      const newitem = this.salesBook.find((o) => o.id === id) || {};
+
+      if (
+        this.book.qty[index] === "" ||
+        parseFloat(this.book.qty[index]) <= 0 ||
+        parseFloat(newitem.productMaxQty) - parseFloat(this.book.qty[index]) <
+          parseFloat(newitem.productMinQty)
+      ) {
+        this.$refs.toast.showToast(
+          "danger",
+          "Product quantity is out of range."
+        );
+        return false;
+      }
+
       this.itemStatus[index] = false;
       const getValue = (property) => this.book?.[property]?.[index] ?? 0;
-
-      const newitem = this.salesBook.find((o) => o.id === id) || {};
       const properties = ["qty", "discountPercent"];
-
       properties.forEach((prop) => (newitem[prop] = getValue(prop)));
       newitem.totalCost = this.calculateNewCost(index);
     },
@@ -860,6 +1048,7 @@ export default {
   mounted() {
     this.loaddata();
     document.getElementById("productItems").focus();
+    document.addEventListener("keydown", this.handleKeyPress);
   },
 };
 </script>

@@ -10,7 +10,7 @@
         @click="navigateTo('/index/supplieradd')"
         to="/index/supplieradd"
       >
-        <img src="/img/icons/plus.svg" class="me-1" alt="img" />Add Brand
+        <img src="/img/icons/plus.svg" class="me-1" alt="img" />Add Supplier
       </router-link>
     </div>
   </div>
@@ -178,7 +178,7 @@ export default {
       const isSidebar = propSidebar || true;
       localStorage.setItem("savedPath", path);
       localStorage.setItem("propSidebar", isSidebar);
-      this.$router.go(0);
+      this.$router.push(path);
     },
     async loadData() {
       this.suppliers = await peopleSupplierApi.fetchAll();

@@ -5,6 +5,7 @@ import IndexPage from "../main/IndexPage.vue";
 import DashboardPage from "../main/DashboardPage.vue";
 import ProductList from "../main/Products/ProductList.vue";
 import AddProduct from "../main/Products/AddProduct.vue";
+import AddVoucher from "../main/Products/AddVoucher.vue";
 import EditProduct from "../main/Products/EditProduct.vue";
 import ProductDetails from "../main/Products/ProductDetails.vue";
 import CategoryList from "../main/Products/CategoryList.vue";
@@ -14,6 +15,7 @@ import SubcategoryList from "../main/Products/SubcategoryList.vue";
 import AddSubcategory from "../main/Products/AddSubcategory.vue";
 import EditsubCategory from "../main/Products/EditsubCategory.vue";
 import BrandList from "../main/Products/BrandList.vue";
+import VoucherList from "../main/Products/VoucherList.vue";
 import AddBrand from "../main/Products/AddBrand.vue";
 import EditBrand from "../main/Products/EditBrand.vue";
 import ImportProduct from "../main/Products/ImportProduct.vue";
@@ -91,6 +93,16 @@ const router = createRouter({
           path: "addproduct",
           name: "AddProduct",
           component: AddProduct,
+        },
+        {
+          path: "voucherlist",
+          name: "VoucherList",
+          component: VoucherList,
+        },
+        {
+          path: "addVoucher",
+          name: "AddVoucher",
+          component: AddVoucher,
         },
         {
           path: "editproduct",

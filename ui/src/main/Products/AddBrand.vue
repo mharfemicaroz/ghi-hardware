@@ -78,9 +78,6 @@ export default {
 
               localStorage.setItem("savedPath", "/index/brandlist/");
               this.$router.push(`/index/brandlist/`);
-              setTimeout(() => {
-                this.$router.go(0);
-              }, 1);
             } catch (error) {
               console.error(error);
             }
@@ -94,7 +91,7 @@ export default {
       const isSidebar = propSidebar || true;
       localStorage.setItem("savedPath", path);
       localStorage.setItem("propSidebar", isSidebar);
-      this.$router.go(0);
+      this.$router.push(path);
     },
   },
 };

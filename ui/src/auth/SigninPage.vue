@@ -84,16 +84,8 @@ export default {
         this.isAuthenticated = true;
         localStorage.setItem("savedPath", "/index/dashboard/");
         this.$refs.toast.showToast("success", "Login successfully!");
-        setTimeout(() => {
-          this.$router.push(`/index/dashboard/`);
-          this.$router.go(0);
-        }, 2000);
+        this.$router.go(0);
       } else {
-        // Swal.fire({
-        //   title: "Error!",
-        //   text: "Invalid login credentials",
-        //   icon: "error",
-        // });
         this.$refs.toast.showToast("danger", "Invalid login credentials!");
       }
     },

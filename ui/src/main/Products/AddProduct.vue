@@ -121,9 +121,38 @@
               />
             </div>
           </div>
-          <div class="col-lg-12">
+          <div class="col-lg-3 col-sm-6 col-12">
+            <div class="form-group">
+              <label>Manufacturing Date </label>
+              <div class="input-groupicon">
+                <input
+                  type="date"
+                  class="form-control"
+                  v-model="manufacturingDate"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-12">
+            <div class="form-group">
+              <label>Expiration Date </label>
+              <div class="input-groupicon">
+                <input
+                  type="date"
+                  class="form-control"
+                  v-model="expirationDate"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 col-sm-6 col-12">
             <div class="form-group">
               <label>Description</label>
+              <input type="text" v-model="desc" />
+            </div>
+          </div>
+          <div class="col-lg-12">
+            <div class="form-group">
               <textarea class="form-control" v-model="desc"></textarea>
             </div>
           </div>
@@ -175,7 +204,7 @@
               </select>
             </div>
           </div>
-          <div class="col-lg-12">
+          <!-- <div class="col-lg-12">
             <div class="form-group">
               <label> {{ imageFileName }}</label>
               <div class="image-upload">
@@ -186,7 +215,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="col-lg-12">
             <button type="submit" class="btn btn-submit me-2">Submit</button>
             <router-link
@@ -233,8 +262,10 @@ export default {
       discount: 0,
       price: 0,
       status: "",
-      imageFile: null,
-      imageFileName: "",
+      manufacturingDate: "",
+      expirationDate: "",
+      // imageFile: null,
+      // imageFileName: "",
     };
   },
   computed: {
@@ -264,8 +295,10 @@ export default {
       this.discount = 0;
       this.price = 0;
       this.status = "";
-      this.imageFile = null;
-      this.imageFileName = "";
+      this.manufacturingDate = "";
+      this.expirationDate = "";
+      // this.imageFile = null;
+      // this.imageFileName = "";
     },
     async addProduct() {
       await productItemApi
@@ -309,13 +342,12 @@ export default {
                       discount: this.discount,
                       price: this.price,
                       status: this.status,
+                      manufacturingDate: this.manufacturingDate,
+                      expirationDate: this.expirationDate,
                     });
 
                     localStorage.setItem("savedPath", "/index/productlist/");
                     this.$router.push(`/index/productlist/`);
-                    setTimeout(() => {
-                      this.$router.go(0);
-                    }, 1);
                   } catch (error) {
                     console.error(error);
                   }
@@ -336,7 +368,7 @@ export default {
       const isSidebar = propSidebar || true;
       localStorage.setItem("savedPath", path);
       localStorage.setItem("propSidebar", isSidebar);
-      this.$router.go(0);
+      this.$router.push(path);
     },
   },
   mounted() {

@@ -124,9 +124,6 @@ export default {
                       "/index/subcategorylist/"
                     );
                     this.$router.push(`/index/subcategorylist/`);
-                    setTimeout(() => {
-                      this.$router.go(0);
-                    }, 1);
                   } catch (error) {
                     console.error(error);
                   }
@@ -147,7 +144,7 @@ export default {
       const isSidebar = propSidebar || true;
       localStorage.setItem("savedPath", path);
       localStorage.setItem("propSidebar", isSidebar);
-      this.$router.go(0);
+      this.$router.push(path);
     },
   },
   mounted() {

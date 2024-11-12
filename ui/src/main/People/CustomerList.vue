@@ -178,7 +178,7 @@ export default {
       const isSidebar = propSidebar || true;
       localStorage.setItem("savedPath", path);
       localStorage.setItem("propSidebar", isSidebar);
-      this.$router.go(0);
+      this.$router.push(path);
     },
     async loadData() {
       this.customers = await peopleCustomerApi.fetchAll();

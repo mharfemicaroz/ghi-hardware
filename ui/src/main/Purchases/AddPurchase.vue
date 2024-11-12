@@ -468,9 +468,6 @@ export default {
 
               localStorage.setItem("savedPath", "/index/purchaselist/");
               this.$router.push(`/index/purchaselist/`);
-              setTimeout(() => {
-                this.$router.go(0);
-              }, 1);
             } catch (error) {
               console.error(error);
             }
@@ -481,7 +478,7 @@ export default {
       const isSidebar = propSidebar || true;
       localStorage.setItem("savedPath", path);
       localStorage.setItem("propSidebar", isSidebar);
-      this.$router.go(0);
+      this.$router.push(path);
     },
     deleteItem(name) {
       const index = this.purchaseBook.findIndex((item) => item.name === name);
@@ -549,7 +546,7 @@ export default {
         });
       };
 
-      inputField.addEventListener("input", function () {
+      inputField?.addEventListener("input", function () {
         const value = this.value;
         closeAllLists();
         if (!value) return;
@@ -572,7 +569,7 @@ export default {
               value.length
             )}</strong>${item.substr(value.length)}`;
             autoCompleteItem.innerHTML += `<input type='hidden' value='${item}'>`;
-            autoCompleteItem.addEventListener("click", function () {
+            autoCompleteItem?.addEventListener("click", function () {
               inputField.value = this.getElementsByTagName("input")[0].value;
               vm.viewItem();
               closeAllLists();
@@ -583,7 +580,7 @@ export default {
         });
       });
 
-      inputField.addEventListener("keydown", function (e) {
+      inputField?.addEventListener("keydown", function (e) {
         const autoCompleteItems = document
           .getElementById(inputField.id + "autocomplete-list")
           ?.querySelectorAll("div");

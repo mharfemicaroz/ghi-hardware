@@ -10,367 +10,373 @@
         </div>
       </div>
       <div v-else>
-        <div
-          class="d-flex justify-content-between align-items-center mt-3 mb-2"
-        >
-          <p class="mb-0 no-print">
-            <label
-              >Show
-              <select
-                v-model="rowsPerPage"
-                aria-controls="example"
-                style="height: 30px; font-size: medium"
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="999999">Show All</option>
-              </select>
-              entries</label
-            >
-            &NonBreakingSpace;
-            <button class="btn btn-sm btn-primary" @click="printSection">
-              <i class="fas fa-print"></i>
-            </button>
-            &nbsp;
-            <button class="btn btn-sm btn-primary" @click="exportXLSX">
-              <i class="fas fa-file-excel"></i>
-            </button>
-            &nbsp;
-            <button class="btn btn-sm btn-primary" @click="saveAsPDF">
-              <i class="fas fa-file-pdf"></i>
-            </button>
-          </p>
-          <div class="form-outline col-md-3 mb-0 no-print">
-            <input
-              type="search"
-              class="form-control"
-              placeholder="Type query"
-              v-model="searchText"
-              aria-label="Search"
-              autocomplete="off"
-              aria-autocomplete="off"
-            />
+        <div style="max-height: 600px; height: 600px; overflow-y: auto">
+          <div
+            class="d-flex justify-content-between align-items-center mt-3 mb-2"
+          >
+            <p class="mb-0 no-print">
+              <button class="btn btn-sm btn-primary" @click="printSection">
+                <i class="fas fa-print"></i>
+              </button>
+              &nbsp;
+              <button class="btn btn-sm btn-primary" @click="exportXLSX">
+                <i class="fas fa-file-excel"></i>
+              </button>
+              &nbsp;
+              <button class="btn btn-sm btn-primary" @click="saveAsPDF">
+                <i class="fas fa-file-pdf"></i>
+              </button>
+            </p>
+            <div class="form-outline col-md-3 mb-0 no-print">
+              <input
+                type="search"
+                class="form-control"
+                placeholder="Type query"
+                v-model="searchText"
+                aria-label="Search"
+                autocomplete="off"
+                aria-autocomplete="off"
+              />
+            </div>
           </div>
-        </div>
 
-        <table class="table" v-bind:id="uniqueID">
-          <thead>
-            <tr v-if="howmanyCheckbox > 0 && batchAction">
-              <th :colspan="mainHeaders.length" style="border: 0px">
-                <slot
-                  name="checkboxtrigger"
-                  :data="{
-                    dt: paginatedMainItems
-                      .filter(function (item) {
-                        return getItemsfromCheckedBoxes.includes(item.id);
-                      })
-                      .map(function (item) {
-                        return item.id;
-                      }),
-                  }"
-                ></slot>
-              </th>
-            </tr>
-            <tr>
-              <template v-for="(header, index) in mainHeaders" :key="index">
-                <th v-if="header.field === 'toggle' && toggleable">
-                  <button
-                    class="btn btn-sm btn-primary no-print"
-                    @click="toggleAll()"
-                  >
-                    <span v-if="showAll === false">+</span>
-                    <span v-else>-</span>
-                  </button>
+          <table class="table" v-bind:id="uniqueID">
+            <thead>
+              <tr v-if="howmanyCheckbox > 0 && batchAction">
+                <th :colspan="mainHeaders.length" style="border: 0px">
+                  <slot
+                    name="checkboxtrigger"
+                    :data="{
+                      dt: paginatedMainItems
+                        .filter(function (item) {
+                          return getItemsfromCheckedBoxes.includes(item.id);
+                        })
+                        .map(function (item) {
+                          return item.id;
+                        }),
+                    }"
+                  ></slot>
                 </th>
-                <th v-else-if="header.field === 'checkbox' && selectable">
-                  <input
-                    type="checkbox"
-                    class="form-check-input no-print"
-                    @change="toggleCheckboxes"
-                    :value="mainCheckbox"
-                  />
-                </th>
-                <th
-                  v-else
-                  @click="sort(header.field)"
-                  :class="{ sortable: header.sortable }"
-                >
-                  {{ header.label }}
-                  <span v-if="header.sortable" class="sort-icon no-print">
-                    <i
-                      :class="[
-                        'fas',
-                        sortColumn === header.field && sortDirection === 1
-                          ? 'fa-sort-alpha-up'
-                          : 'fa-sort-alpha-down',
-                      ]"
-                    ></i>
-                  </span>
-                </th>
-              </template>
-            </tr>
-          </thead>
-          <tbody>
-            <template
-              v-for="(mainItem, mainIndex) in paginatedMainItems"
-              :key="mainItem.id"
-            >
-              <tr :class="{ 'table-active': showTable[mainItem.id] }">
-                <td
-                  v-for="(header, index) in mainHeaders"
-                  :key="index"
-                  style="
-                    word-wrap: break-word;
-                    white-space: normal;
-                    overflow: hidden;
-                    max-width: 100%;
-                  "
-                >
-                  <template v-if="header.field === 'checkbox' && selectable">
-                    <input
-                      type="checkbox"
-                      class="mtCheckbox form-check-input no-print"
-                      :data-id="mainItem.id"
-                      @change="toggleCheckbox"
-                    />
-                  </template>
-                  <template v-else-if="header.field === 'toggle' && toggleable">
+              </tr>
+              <tr>
+                <template v-for="(header, index) in mainHeaders" :key="index">
+                  <th v-if="header.field === 'toggle' && toggleable">
                     <button
-                      type="button"
-                      @click="toggleTable(mainItem.id)"
-                      class="btn btn-primary btn-sm toggle no-print"
+                      class="btn btn-sm btn-primary no-print"
+                      @click="toggleAll()"
                     >
-                      <span v-if="!showTable[mainItem.id]">+</span>
+                      <span v-if="showAll === false">+</span>
                       <span v-else>-</span>
                     </button>
-                  </template>
-                  <template v-else-if="header.field === 'action'">
-                    <button
-                      v-if="this.editable"
-                      type="button"
-                      class="btn btn-primary btn-sm no-print"
-                      @click="$emit('edit-action', mainItem.id)"
-                      style="margin-right: 10px"
-                    >
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      v-if="this.custombtn"
-                      type="button"
-                      class="btn btn-primary btn-sm no-print"
-                      @click="$emit('custombtn-action', mainItem.id)"
-                    >
-                      <i class="fa fa-eye"></i>
-                    </button>
-                    <div v-if="moreAction">
-                      <a
-                        class="me-3 dropset"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                        href="javascript:void(0);"
-                        ><img src="/img/icons/ellipise1.svg" alt="img"
-                      /></a>
-                      <ul
-                        class="dropdown-menu"
-                        aria-labelledby="dropdownMenuButton"
-                        data-popper-placement="bottom-end"
-                      >
-                        <li v-for="(btn, index) of this.actionBtns">
-                          <a
-                            href="javascript:void(0);"
-                            class="dropdown-item"
-                            @click="
-                              $emit(`btn-action${index + 1}`, mainItem.id)
-                            "
-                            >{{ btn }}</a
-                          >
-                        </li>
-                      </ul>
-                    </div>
-                    <button
-                      v-if="this.deletable"
-                      type="button"
-                      class="btn btn-danger btn-sm no-print"
-                      @click="$emit('delete-action', mainItem.id)"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
-                    <template v-if="header.slot" class="no-print">
-                      <slot
-                        name="custombtn"
-                        :data="{ h: header.field, dt: mainItem }"
-                      ></slot>
-                    </template>
-                  </template>
-                  <template
-                    v-else-if="header.field.toLowerCase().includes('date')"
+                  </th>
+                  <th v-else-if="header.field === 'checkbox' && selectable">
+                    <input
+                      type="checkbox"
+                      class="form-check-input no-print"
+                      @change="toggleCheckboxes"
+                      :value="mainCheckbox"
+                    />
+                  </th>
+                  <th
+                    v-else
+                    @click="sort(header.field)"
+                    :class="{ sortable: header.sortable }"
                   >
-                    {{ formatDate(new Date(mainItem[header.field])) }}
-                  </template>
-                  <template v-else>
-                    <template v-if="header.slot">
-                      <slot
-                        name="content"
-                        :data="{ h: header.field, dt: mainItem }"
-                      ></slot>
+                    {{ header.label }}
+                    <span v-if="header.sortable" class="sort-icon no-print">
+                      <i
+                        :class="[
+                          'fas',
+                          sortColumn === header.field && sortDirection === 1
+                            ? 'fa-sort-alpha-up'
+                            : 'fa-sort-alpha-down',
+                        ]"
+                      ></i>
+                    </span>
+                  </th>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <template
+                v-for="(mainItem, mainIndex) in paginatedMainItems"
+                :key="mainItem.id"
+              >
+                <tr :class="{ 'table-active': showTable[mainItem.id] }">
+                  <td
+                    v-for="(header, index) in mainHeaders"
+                    :key="index"
+                    style="
+                      word-wrap: break-word;
+                      white-space: normal;
+                      overflow: hidden;
+                      max-width: 100%;
+                    "
+                  >
+                    <template v-if="header.field === 'checkbox' && selectable">
+                      <input
+                        type="checkbox"
+                        class="mtCheckbox form-check-input no-print"
+                        :data-id="mainItem.id"
+                        @change="toggleCheckbox"
+                      />
+                    </template>
+                    <template
+                      v-else-if="header.field === 'toggle' && toggleable"
+                    >
+                      <button
+                        type="button"
+                        @click="toggleTable(mainItem.id)"
+                        class="btn btn-primary btn-sm toggle no-print"
+                      >
+                        <span v-if="!showTable[mainItem.id]">+</span>
+                        <span v-else>-</span>
+                      </button>
+                    </template>
+                    <template v-else-if="header.field === 'action'">
+                      <div v-if="this.editable" style="text-align: right">
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-sm no-print"
+                          @click="$emit('edit-action', mainItem.id)"
+                          style="margin-right: 10px"
+                        >
+                          <i class="fas fa-edit"></i>
+                        </button>
+                      </div>
+                      <div v-if="this.custombtn" style="text-align: right">
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-sm no-print"
+                          @click="$emit('custombtn-action', mainItem.id)"
+                        >
+                          <i class="fa fa-eye"></i>
+                        </button>
+                      </div>
+                      <div v-if="moreAction" style="text-align: right">
+                        <a
+                          class="me-3 dropset"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                          href="javascript:void(0);"
+                          ><img src="/img/icons/ellipise1.svg" alt="img"
+                        /></a>
+                        <ul
+                          class="dropdown-menu"
+                          aria-labelledby="dropdownMenuButton"
+                          data-popper-placement="bottom-end"
+                        >
+                          <li v-for="(btn, index) of this.actionBtns">
+                            <a
+                              href="javascript:void(0);"
+                              class="dropdown-item"
+                              @click="
+                                $emit(`btn-action${index + 1}`, mainItem.id)
+                              "
+                              >{{ btn }}</a
+                            >
+                          </li>
+                        </ul>
+                      </div>
+                      <button
+                        v-if="this.deletable"
+                        type="button"
+                        class="btn btn-danger btn-sm no-print"
+                        @click="$emit('delete-action', mainItem.id)"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                      <template v-if="header.slot" class="no-print">
+                        <slot
+                          name="custombtn"
+                          :data="{ h: header.field, dt: mainItem }"
+                        ></slot>
+                      </template>
+                    </template>
+                    <template
+                      v-else-if="header.field.toLowerCase().includes('date')"
+                    >
+                      {{ formatDate(new Date(mainItem[header.field])) }}
                     </template>
                     <template v-else>
-                      {{
-                        typeof mainItem[header.field] === "object" &&
-                        mainItem[header.field]
-                          ? (Object.entries(mainItem[header.field]).find(
-                              (entry) => entry[0] === header.identifier
-                            ) || [null, null])[1]
-                          : mainItem[header.field]
-                      }}
+                      <template v-if="header.slot">
+                        <slot
+                          name="content"
+                          :data="{ h: header.field, dt: mainItem }"
+                        ></slot>
+                      </template>
+                      <template v-else>
+                        {{
+                          typeof mainItem[header.field] === "object" &&
+                          mainItem[header.field]
+                            ? (Object.entries(mainItem[header.field]).find(
+                                (entry) => entry[0] === header.identifier
+                              ) || [null, null])[1]
+                            : mainItem[header.field]
+                        }}
+                      </template>
                     </template>
-                  </template>
-                </td>
-              </tr>
-              <tr v-if="showTable[mainItem.id] && toggleable">
-                <td :colspan="mainHeaders.length">
-                  <div v-if="slotsub" style="padding-left: 60px">
-                    <slot name="subcontent" :data="mainItem.items"></slot>
-                  </div>
-                  <div v-else style="padding-left: 60px">
-                    <div v-if="mainItem.items.length > 0">
-                      <table
-                        class="table"
-                        style="table-layout: fixed; word-wrap: break-word"
-                      >
-                        <thead>
-                          <tr>
-                            <template
-                              v-for="(subHeader, index) in subHeaders"
-                              :key="index"
-                            >
-                              <th>{{ subHeader.label }}</th>
-                            </template>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <template
-                            v-for="(subItem, subIndex) in mainItem.items"
-                            :key="subIndex"
-                          >
+                  </td>
+                </tr>
+                <tr v-if="showTable[mainItem.id] && toggleable">
+                  <td :colspan="mainHeaders.length">
+                    <div v-if="slotsub" style="padding-left: 60px">
+                      <slot name="subcontent" :data="mainItem.items"></slot>
+                    </div>
+                    <div v-else style="padding-left: 60px">
+                      <div v-if="mainItem.items.length > 0">
+                        <table
+                          class="table"
+                          style="table-layout: fixed; word-wrap: break-word"
+                        >
+                          <thead>
                             <tr>
                               <template
                                 v-for="(subHeader, index) in subHeaders"
                                 :key="index"
                               >
-                                <template
-                                  v-if="subHeader.field.includes('date')"
-                                >
-                                  <td>
-                                    {{
-                                      formatDate(
-                                        new Date(subItem[subHeader.field])
-                                      )
-                                    }}
-                                  </td>
-                                </template>
-                                <template v-else>
-                                  <td>{{ subItem[subHeader.field] }}</td>
-                                </template>
+                                <th>{{ subHeader.label }}</th>
                               </template>
                             </tr>
-                          </template>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div v-if="mainItem.items2 && mainItem.items2.length > 0">
-                      <table
-                        class="table"
-                        style="table-layout: fixed; word-wrap: break-word"
-                      >
-                        <thead>
-                          <tr>
+                          </thead>
+                          <tbody>
                             <template
-                              v-for="(subHeader, index) in subHeaders2"
-                              :key="index"
+                              v-for="(subItem, subIndex) in mainItem.items"
+                              :key="subIndex"
                             >
-                              <th>{{ subHeader.label }}</th>
+                              <tr>
+                                <template
+                                  v-for="(subHeader, index) in subHeaders"
+                                  :key="index"
+                                >
+                                  <template
+                                    v-if="subHeader.field.includes('date')"
+                                  >
+                                    <td>
+                                      {{
+                                        formatDate(
+                                          new Date(subItem[subHeader.field])
+                                        )
+                                      }}
+                                    </td>
+                                  </template>
+                                  <template v-else>
+                                    <td>{{ subItem[subHeader.field] }}</td>
+                                  </template>
+                                </template>
+                              </tr>
                             </template>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <template
-                            v-for="(subItem, subIndex) in mainItem.items2"
-                            :key="subIndex"
-                          >
+                          </tbody>
+                        </table>
+                      </div>
+                      <div v-if="mainItem.items2 && mainItem.items2.length > 0">
+                        <table
+                          class="table"
+                          style="table-layout: fixed; word-wrap: break-word"
+                        >
+                          <thead>
                             <tr>
                               <template
                                 v-for="(subHeader, index) in subHeaders2"
                                 :key="index"
                               >
-                                <template
-                                  v-if="subHeader.field.includes('date')"
-                                >
-                                  <td>
-                                    {{
-                                      formatDate(
-                                        new Date(subItem[subHeader.field])
-                                      )
-                                    }}
-                                  </td>
-                                </template>
-                                <template v-else>
-                                  <td>{{ subItem[subHeader.field] }}</td>
-                                </template>
+                                <th>{{ subHeader.label }}</th>
                               </template>
                             </tr>
-                          </template>
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            <template
+                              v-for="(subItem, subIndex) in mainItem.items2"
+                              :key="subIndex"
+                            >
+                              <tr>
+                                <template
+                                  v-for="(subHeader, index) in subHeaders2"
+                                  :key="index"
+                                >
+                                  <template
+                                    v-if="subHeader.field.includes('date')"
+                                  >
+                                    <td>
+                                      {{
+                                        formatDate(
+                                          new Date(subItem[subHeader.field])
+                                        )
+                                      }}
+                                    </td>
+                                  </template>
+                                  <template v-else>
+                                    <td>{{ subItem[subHeader.field] }}</td>
+                                  </template>
+                                </template>
+                              </tr>
+                            </template>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
+                  </td>
+                </tr>
+              </template>
+              <tr
+                v-if="
+                  mainHeaders.filter((header) => header.reducible).length > 0
+                "
+              >
+                <td v-for="(header, index) in mainHeaders" :key="index">
+                  <span
+                    class="text-primary"
+                    v-if="header.reducible"
+                    style="font-weight: bold"
+                    >{{ sumColumn(header.field).toFixed(2) }}</span
+                  >
                 </td>
               </tr>
-            </template>
-            <tr>
-              <td v-for="(header, index) in mainHeaders" :key="index">
-                <span
-                  class="text-primary"
-                  v-if="header.reducible"
-                  style="font-weight: bold"
-                  >{{ sumColumn(header.field).toFixed(2) }}</span
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
         <div class="no-print">
-          <nav aria-label="Table pagination">
-            <div class="d-flex justify-content-between align-items-center mt-3">
-              <p class="mb-0">
-                Showing
-                {{
-                  Math.min(
-                    (currentPage - 1) * rowsPerPage + 1,
-                    paginatedMainItems.length
-                  )
-                }}
-                to
-                {{
-                  Math.min(currentPage * rowsPerPage, paginatedMainItems.length)
-                }}
-                of {{ paginatedMainItems.length }} entries{{
-                  searchText
-                    ? " (filtered from " + mainItems.length + " total entries)"
-                    : ""
-                }}
-              </p>
+          <div class="d-flex justify-content-end align-items-center mt-3">
+            <div
+              class="form-group d-flex align-items-center me-3"
+              style="margin-right: 24px"
+            >
+              <label
+                for="rowsPerPage"
+                class="me-2 mb-0"
+                style="white-space: nowrap"
+                >Items per page:</label
+              >
+              <select
+                id="rowsPerPage"
+                class="form-select"
+                v-model="rowsPerPage"
+                aria-controls="example"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="999999">All</option>
+              </select>
+            </div>
 
-              <ul class="pagination mb-0">
+            <div class="form-group me-3">
+              {{ (currentPage - 1) * rowsPerPage + 1 }}
+              -
+              {{ Math.min(currentPage * rowsPerPage, mainItems.length) }}
+              of {{ mainItems.length }}
+            </div>
+
+            <div class="form-group">
+              <ul class="pagination">
                 <li class="page-item" :class="{ disabled: currentPage === 1 }">
                   <button
                     class="page-link btn-primary text-white"
                     @click="currentPage = 1"
                     aria-label="First page"
                   >
-                    <span aria-hidden="true">First</span>
+                    <i class="fa fa-angle-double-left" aria-hidden="true"></i>
                   </button>
                 </li>
                 <li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -379,7 +385,7 @@
                     @click="currentPage -= 1"
                     aria-label="Previous"
                   >
-                    <span aria-hidden="true">Previous</span>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                   </button>
                 </li>
                 <li
@@ -410,7 +416,7 @@
                     @click="currentPage += 1"
                     aria-label="Next"
                   >
-                    <span aria-hidden="true">Next</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                   </button>
                 </li>
                 <li
@@ -422,12 +428,12 @@
                     @click="currentPage = pageCount"
                     aria-label="Last page"
                   >
-                    <span aria-hidden="true">Last</span>
+                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                   </button>
                 </li>
               </ul>
             </div>
-          </nav>
+          </div>
         </div>
       </div>
     </div>
@@ -437,6 +443,9 @@
 <script>
 import xlsx from "json-as-xlsx";
 import jsPDF from "jspdf";
+import $ from "jquery";
+
+window.$ = window.jQuery = $;
 
 export default {
   props: {
@@ -520,6 +529,19 @@ export default {
       howmanyCheckbox: 0,
       getItemsfromCheckedBoxes: [],
     };
+  },
+  watch: {
+    rowsPerPage: {
+      immediate: true,
+      deep: true,
+      handler() {
+        this.$nextTick(() => {
+          if (this.currentPage > 0) {
+            this.currentPage = 1;
+          }
+        });
+      },
+    },
   },
   computed: {
     paginatedMainItems() {

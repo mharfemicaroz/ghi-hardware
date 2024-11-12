@@ -1,4 +1,5 @@
 $(document).ready(function () {
+  $(".select").select2();
   var $wrapper = $(".main-wrapper");
   var $slimScrolls = $(".slimscroll");
   var $pageWrapper = $(".page-wrapper");
